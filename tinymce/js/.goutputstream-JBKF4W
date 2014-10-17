@@ -1,0 +1,96 @@
+// JavaScript Document
+// Parse the information from the input string coming from Moodle's HTMLArea 
+// right into the text fields
+
+var splitstring;
+// var longstring = "{1:MULTICHOICE:%0%global delivery system#~%100%local management system#~%0%communal drainage system#~%0%state funding system#}";
+
+function loadContent() {
+  // Local testing purpose
+  // Does not affect online experience  
+  
+  if (typeof(splitstring) == "undefined") {
+    splitstring = longstring;
+  } 
+  
+  // check if user highlighted code or plain text            
+  if (isCode(splitstring)) {
+    // user highlighted quiz code
+    for (var i = 1; i<=countAnswers(); i++) {
+      // add as many lines as there are answers
+      addRow('main_table'); 
+    }
+    
+    // Fill all input boxes with code from Moodle's HTMLArea accordingly
+    fillBoxes(splitstring);
+    encode();
+  } else if (isCode(splitstring) == false) {
+    // user highlighted text
+    // add three rows, standard input
+    addRow('main_table');
+    addRow('main_table');
+    addRow('main_table');
+    
+    // fill only the first box, because the user selected text
+    fillFirstBoxOnly(splitstring);
+  }
+  
+  // Toogle throttle column accordingly
+  toggleThrottle();
+}
+
+// Fill boxes with quiz code coming from Moodle's HTMLArea
+function fillBoxes(string) {
+  // TODO: should be reforget according to the getELEMENTNAMEElement() style
+  var f = document.forms[0];
+  var selection;
+  
+  // inserted for local testing purposes
+  if (typeof(tinyMCEPopup) != 'undefined') {
+    selection = tinyMCEPopup.editor.selection.getContent({format : 'text'});
+  } else {
+    selection = longstring;
+  }
+   
+  // insert points
+  f.weighting.value = getPoints(selection);
+  
+  // set test variant
+  setTestVariant(getQuizTypeFromString(selection));  
+   
+  // fill boxes
+  var i = 1;
+  var defined = true;
+  while (defined == true) {
+    // loop through all table rows and fill inputs
+    if (getAnswerElement(i)) { // Check if element exists
+      getAnswerElement(i).value = getAnswer(selection, i);
+      getPercentElement(i).value = getPercentage(selection, i);
+      
+      // TODO
+      if (getPercentage(selection, i) == '100') {
+        checkPercentOnLeave(i)
+      } else { 
+        checkPercentOnLeave(i);
+      }
+      getFeedbackElement(i).value = getComment(selection, i);
+      getThrottleElement(i).value = getThrottle(selection, i);
+      i = i+1;
+    } else {
+      defined = false;
+    }
+  } 
+}
+
+
+
+
+// Fill boxes with quiz code coming from Moodle's HTMLArea
+function fillBoxesEO(preset) {
+   
+ 
+    var preflag=true;
+
+  if (preset = 'alkene') {
+
+  //  var	selection = '{1:MULTICHOICE:%100%KMnO
